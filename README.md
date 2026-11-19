@@ -1,0 +1,96 @@
+# Amader Agency - Backend API
+
+Express + TypeScript + Prisma (PostgreSQL). Auth via httpOnly JWT cookie, images on Cloudinary, lead emails via SMTP.
+
+## Setup
+
+```bash
+npm install
+cp .env.example .env        # fill DATABASE_URL, JWT_SECRET, REVALIDATE_SECRET, SEED_ADMIN_PASSWORD
+npx prisma migrate dev --name init
+npm run seed                # admin user + 4 services from the brand prospectus + site settings
+npm run dev                 # http://localhost:5000
+```
+
+Generate secrets:
+`node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`
+
+Other scripts: `npm run typecheck`, `npm run build`, `npm start`, `npm run prisma:studio`.
+Production deploy: `npm run build && npx prisma migrate deploy && npm start`.
+
+## Response format
+
+Success: `{ "success": true, "data": ... }` (lists with pagination also return `meta`).
+Error: `{ "success": false, "message": "...", "errors": [...] }`.
+
+## Public endpoints (`/api/v1`)
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/services` | active services, ordered |
+| GET | `/services/:slug` | service + up to 6 portfolio items |
+| GET | `/portfolio?service=<slug>&featured=true&page=1&limit=12` | paginated |
+| GET | `/portfolio/:slug` | single item |
+| GET | `/testimonials` | only `isActive` ones |
+| GET | `/settings` | phone, email, whatsapp, address, hours, socials |
+| POST | `/leads` | contact form. Rate limited (5/hour/IP), honeypot field `website` |
+
+Lead body: `name, phone, message` (required), `email, serviceId, budget, source` (optional).
+
+## Auth
+
+| Method | Path |
+|---|---|
+| POST | `/auth/login` `{ email, password }` sets `aa_token` cookie |
+| POST | `/auth/logout` |
+| GET | `/auth/me` |
+| PATCH | `/auth/password` `{ currentPassword, newPassword }` |
+
+## Admin endpoints (`/api/v1/admin/*`, login required)
+
+- `/services` GET, POST, `/:id` GET PATCH DELETE, `PATCH /reorder { items: [{ id, order }] }`
+- `/portfolio` GET (`?serviceId=&search=&page=&limit=`), POST, `/:id` GET PATCH DELETE, `PATCH /reorder`
+- `/leads` GET (`?status=&serviceId=&search=&page=`), `GET /stats`, `GET /:id`, `PATCH /:id/status { status }`, `DELETE /:id`
+- `/testimonials` GET, POST, `PATCH /:id`, `DELETE /:id`
+- `/settings` GET, `PUT`
+- `/upload/image` POST multipart field `file` (max 5MB, optional `?folder=portfolio`) returns `{ url, publicId, width, height }`; `DELETE` body `{ publicId }`
+
+## Frontend integration
+
+**Axios (admin):** `axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL + "/api/v1", withCredentials: true })`
+
+**Public pages (ISR):** fetch with tags so the backend can refresh them:
+
+```ts
+const res = await fetch(`${process.env.API_URL}/api/v1/services`, { next: { tags: ["services"] } });
+```
+
+**Revalidate webhook** `frontend/app/api/revalidate/route.ts` (the backend calls it after every admin change):
+
+```ts
+import { revalidateTag } from "next/cache";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function POST(req: NextRequest) {
+  if (req.headers.get("x-revalidate-secret") !== process.env.REVALIDATE_SECRET) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+  const { tags } = (await req.json()) as { tags?: string[] };
+  for (const tag of tags ?? []) revalidateTag(tag, "max"); // Next 15 or older: revalidateTag(tag)
+  return NextResponse.json({ revalidated: true });
+}
+```
+
+Tags used: `services`, `portfolio`, `testimonials`, `settings`. Put the same `REVALIDATE_SECRET` in both `.env` files.
+
+## Cookies and deployment
+
+- Dev: frontend `localhost:3000`, API `localhost:5000` works with `COOKIE_SAMESITE=lax`.
+- Production: use sibling subdomains (`amaderagency.com` + `api.amaderagency.com`) and set `COOKIE_DOMAIN=.amaderagency.com`, `COOKIE_SAMESITE=lax`. Then Next.js middleware can read the `aa_token` cookie to protect `/admin`.
+- Different sites entirely: `COOKIE_SAMESITE=none` (forces `secure`, needs HTTPS).
+
+## Notes
+
+- Deleting a service that still has portfolio items is blocked (409). Deactivate it instead or move the items.
+- Deleting a portfolio item does not delete its Cloudinary images; call `DELETE /admin/upload/image` for each `publicId` if you want to clean up.
+- Testimonials are `isActive: false` by default, so nothing unverified goes live by accident.

@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Service {
+  id              String          @id @default(cuid())
+  title           String
+  slug            String          @unique
+  icon            String?
+  shortDesc       String
+  description     String          @db.Text
+  features        String[]
+  order           Int             @default(0)
+  isActive        Boolean         @default(true)
+  metaTitle       String?
+  metaDescription String?
+  portfolio       PortfolioItem[]
+  leads           Lead[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([isActive, order])
+}
+
+model PortfolioItem {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  client      String?
+  cover       String
+  gallery     String[]
+  videoUrl    String?
+  description String   @db.Text
+  tags        String[]
+  featured    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  serviceId   String
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([serviceId])
+  @@index([isActive, featured, order])
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  budget    String?
+  message   String     @db.Text
+  status    LeadStatus @default(NEW)
+  source    String?
+  serviceId String?
+  service   Service?   @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  createdAt DateTime   @default(now())
+
+  @@index([status, createdAt])
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  role      String?
+  text      String   @db.Text
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id            Int     @id @default(1)
+  phone         String?
+  email         String?
+  whatsapp      String?
+  address       String?
+  businessHours String?
+  socials       Json?
+}
