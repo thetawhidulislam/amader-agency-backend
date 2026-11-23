@@ -88,6 +88,23 @@ model Testimonial {
   createdAt DateTime @default(now())
 }
 
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  department  String?
+  bio         String?  @db.Text
+  photo       String?
+  socials     Json?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  showOnHome  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, order])
+}
+
 model SiteSettings {
   id            Int     @id @default(1)
   phone         String?

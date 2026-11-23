@@ -32,6 +32,7 @@ Error: `{ "success": false, "message": "...", "errors": [...] }`.
 | GET | `/portfolio?service=<slug>&featured=true&page=1&limit=12` | paginated |
 | GET | `/portfolio/:slug` | single item |
 | GET | `/testimonials` | only `isActive` ones |
+| GET | `/team?home=true&limit=12` | active team members; `home=true` filters to members shown on home |
 | GET | `/settings` | phone, email, whatsapp, address, hours, socials |
 | POST | `/leads` | contact form. Rate limited (5/hour/IP), honeypot field `website` |
 
@@ -52,8 +53,9 @@ Lead body: `name, phone, message` (required), `email, serviceId, budget, source`
 - `/portfolio` GET (`?serviceId=&search=&page=&limit=`), POST, `/:id` GET PATCH DELETE, `PATCH /reorder`
 - `/leads` GET (`?status=&serviceId=&search=&page=`), `GET /stats`, `GET /:id`, `PATCH /:id/status { status }`, `DELETE /:id`
 - `/testimonials` GET, POST, `PATCH /:id`, `DELETE /:id`
+- `/team` GET, POST, `PATCH /reorder { items: [{ id, order }] }`, `GET /:id`, `PATCH /:id`, `DELETE /:id`
 - `/settings` GET, `PUT`
-- `/upload/image` POST multipart field `file` (max 5MB, optional `?folder=portfolio`) returns `{ url, publicId, width, height }`; `DELETE` body `{ publicId }`
+- `/upload/image` POST multipart field `file` (max 5MB, optional `?folder=portfolio|team`) returns `{ url, publicId, width, height }`; `DELETE` body `{ publicId }`
 
 ## Frontend integration
 
@@ -81,7 +83,7 @@ export async function POST(req: NextRequest) {
 }
 ```
 
-Tags used: `services`, `portfolio`, `testimonials`, `settings`. Put the same `REVALIDATE_SECRET` in both `.env` files.
+Tags used: `services`, `portfolio`, `testimonials`, `team`, `settings`. Put the same `REVALIDATE_SECRET` in both `.env` files.
 
 ## Cookies and deployment
 
