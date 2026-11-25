@@ -9,6 +9,10 @@ export const listPublic = asyncHandler(async (_req, res) => {
   res.json({ success: true, data: await service.listPublic(res.locals.query as PublicTeamQuery) });
 });
 
+export const getPublicBySlug = asyncHandler(async (req, res) => {
+  res.json({ success: true, data: await service.getPublicBySlug(req.params.slug) });
+});
+
 export const listAdmin = asyncHandler(async (_req, res) => {
   res.json({ success: true, data: await service.listAdmin() });
 });

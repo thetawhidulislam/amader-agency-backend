@@ -91,9 +91,12 @@ model Testimonial {
 model TeamMember {
   id          String   @id @default(cuid())
   name        String
+  slug        String?  @unique
   role        String
   department  String?
   bio         String?  @db.Text
+  about       String?  @db.Text
+  skills      String[]
   photo       String?
   socials     Json?
   order       Int      @default(0)

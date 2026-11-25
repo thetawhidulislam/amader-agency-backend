@@ -6,6 +6,7 @@ import { createTeamSchema, publicTeamQuerySchema, updateTeamSchema } from "./tea
 
 export const publicRoutes = Router();
 publicRoutes.get("/", validate({ query: publicTeamQuerySchema }), controller.listPublic);
+publicRoutes.get("/:slug", controller.getPublicBySlug);
 
 export const adminRoutes = Router();
 adminRoutes.get("/", controller.listAdmin);

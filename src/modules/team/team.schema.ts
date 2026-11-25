@@ -1,11 +1,14 @@
 import { z } from "zod";
-import { nullableText, nullableUrl } from "../../utils/zod";
+import { nullableText, nullableUrl, slugSchema } from "../../utils/zod";
 
 export const createTeamSchema = z.object({
   name: z.string().trim().min(2).max(100),
+  slug: slugSchema.optional(),
   role: z.string().trim().min(2).max(100),
   department: nullableText(100),
   bio: nullableText(400),
+  about: nullableText(5000),
+  skills: z.array(z.string().trim().min(1).max(40)).max(15).default([]),
   photo: nullableUrl,
   socials: z.record(z.string().url().max(300)).optional(),
   order: z.number().int().min(0).default(0),

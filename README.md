@@ -33,6 +33,7 @@ Error: `{ "success": false, "message": "...", "errors": [...] }`.
 | GET | `/portfolio/:slug` | single item |
 | GET | `/testimonials` | only `isActive` ones |
 | GET | `/team?home=true&limit=12` | active team members; `home=true` filters to members shown on home |
+| GET | `/team/:slug` | active team member profile |
 | GET | `/settings` | phone, email, whatsapp, address, hours, socials |
 | POST | `/leads` | contact form. Rate limited (5/hour/IP), honeypot field `website` |
 
