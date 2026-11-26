@@ -1,9 +1,10 @@
 import { prisma } from "../../config/prisma";
 import { ApiError } from "../../utils/ApiError";
 import { asyncHandler } from "../../utils/asyncHandler";
+import { runInBackground } from "../../utils/background";
 import { revalidateFrontend } from "../../utils/revalidate";
 
-const refresh = () => void revalidateFrontend(["testimonials"]);
+const refresh = () => runInBackground(revalidateFrontend(["testimonials"]));
 
 /* public */
 export const listPublic = asyncHandler(async (_req, res) => {

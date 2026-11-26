@@ -32,7 +32,13 @@ app.get("/health", (_req, res) => {
   res.json({ success: true, status: "ok", uptime: process.uptime() });
 });
 
+app.get("/", (_req, res) => {
+  res.json({ success: true, name: "Amader Agency API" });
+});
+
 app.use("/api/v1", globalLimiter, routes);
 
 app.use(notFound);
 app.use(errorHandler);
+
+export default app;

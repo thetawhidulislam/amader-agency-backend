@@ -1,8 +1,9 @@
 import { asyncHandler } from "../../utils/asyncHandler";
+import { runInBackground } from "../../utils/background";
 import { revalidateFrontend } from "../../utils/revalidate";
 import * as service from "./services.service";
 
-const refresh = () => void revalidateFrontend(["services", "portfolio"]);
+const refresh = () => runInBackground(revalidateFrontend(["services", "portfolio"]));
 
 /* public */
 export const listPublic = asyncHandler(async (_req, res) => {

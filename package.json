@@ -2,12 +2,14 @@
   "name": "amader-agency-backend",
   "version": "1.0.0",
   "private": true,
-  "main": "dist/server.js",
-  "engines": { "node": ">=20" },
+  "main": "dist/app.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/local.ts",
     "build": "prisma generate && tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/local.js",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -17,6 +19,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
+    "@vercel/functions": "^3.11.4",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",

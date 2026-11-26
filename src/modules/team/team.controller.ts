@@ -1,9 +1,10 @@
 import { asyncHandler } from "../../utils/asyncHandler";
+import { runInBackground } from "../../utils/background";
 import { revalidateFrontend } from "../../utils/revalidate";
 import type { PublicTeamQuery } from "./team.schema";
 import * as service from "./team.service";
 
-const refresh = () => void revalidateFrontend(["team"]);
+const refresh = () => runInBackground(revalidateFrontend(["team"]));
 
 export const listPublic = asyncHandler(async (_req, res) => {
   res.json({ success: true, data: await service.listPublic(res.locals.query as PublicTeamQuery) });

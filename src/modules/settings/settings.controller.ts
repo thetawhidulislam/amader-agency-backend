@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../../config/prisma";
 import { asyncHandler } from "../../utils/asyncHandler";
+import { runInBackground } from "../../utils/background";
 import { revalidateFrontend } from "../../utils/revalidate";
 import type { UpdateSettingsInput } from "./settings.schema";
 
@@ -32,6 +33,6 @@ export const update = asyncHandler(async (req, res) => {
     create: { id: 1, ...data },
   });
 
-  void revalidateFrontend(["settings"]);
+  runInBackground(revalidateFrontend(["settings"]));
   res.json({ success: true, data: settings });
 });

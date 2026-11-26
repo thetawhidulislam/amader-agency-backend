@@ -18,6 +18,23 @@ Generate secrets:
 Other scripts: `npm run typecheck`, `npm run build`, `npm start`, `npm run prisma:studio`.
 Production deploy: `npm run build && npx prisma migrate deploy && npm start`.
 
+## Deploy on Vercel
+
+Import the backend folder as a Vercel project. Vercel detects the Express app in `src/app.ts`; the local `npm run dev` and `npm start` commands use `src/local.ts` to connect Prisma and listen on the configured port.
+
+Set these project environment variables:
+
+- `DATABASE_URL`, `DIRECT_URL`
+- `JWT_SECRET`, `JWT_EXPIRES_DAYS`
+- `FRONTEND_URL`, `CORS_ORIGINS`
+- `COOKIE_DOMAIN`, `COOKIE_SAMESITE`
+- `REVALIDATE_SECRET`
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`
+- `MAIL_FROM`, `LEAD_NOTIFY_EMAIL`
+
+The Vercel build command generates Prisma Client and applies production migrations. Uploaded images must be 4MB or smaller.
+
 ## Response format
 
 Success: `{ "success": true, "data": ... }` (lists with pagination also return `meta`).
@@ -56,7 +73,7 @@ Lead body: `name, phone, message` (required), `email, serviceId, budget, source`
 - `/testimonials` GET, POST, `PATCH /:id`, `DELETE /:id`
 - `/team` GET, POST, `PATCH /reorder { items: [{ id, order }] }`, `GET /:id`, `PATCH /:id`, `DELETE /:id`
 - `/settings` GET, `PUT`
-- `/upload/image` POST multipart field `file` (max 5MB, optional `?folder=portfolio|team`) returns `{ url, publicId, width, height }`; `DELETE` body `{ publicId }`
+- `/upload/image` POST multipart field `file` (max 4MB, optional `?folder=portfolio|team`) returns `{ url, publicId, width, height }`; `DELETE` body `{ publicId }`
 
 ## Frontend integration
 

@@ -1,9 +1,10 @@
 import { asyncHandler } from "../../utils/asyncHandler";
+import { runInBackground } from "../../utils/background";
 import { revalidateFrontend } from "../../utils/revalidate";
 import type { AdminPortfolioQuery, PublicPortfolioQuery } from "./portfolio.schema";
 import * as service from "./portfolio.service";
 
-const refresh = () => void revalidateFrontend(["portfolio", "services"]);
+const refresh = () => runInBackground(revalidateFrontend(["portfolio", "services"]));
 
 /* public */
 export const listPublic = asyncHandler(async (_req, res) => {

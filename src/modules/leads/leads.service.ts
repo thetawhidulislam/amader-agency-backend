@@ -3,6 +3,7 @@ import { env } from "../../config/env";
 import { sendMail } from "../../config/mailer";
 import { prisma } from "../../config/prisma";
 import { ApiError } from "../../utils/ApiError";
+import { runInBackground } from "../../utils/background";
 import { escapeHtml } from "../../utils/escapeHtml";
 import type { AdminLeadsQuery, CreateLeadInput } from "./leads.schema";
 
@@ -62,7 +63,7 @@ export async function createLead(input: LeadData) {
     },
   });
 
-  void sendLeadEmails(lead, service?.title);
+  runInBackground(sendLeadEmails(lead, service?.title));
   return { id: lead.id };
 }
 
