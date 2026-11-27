@@ -18,6 +18,10 @@ Generate secrets:
 Other scripts: `npm run typecheck`, `npm run build`, `npm start`, `npm run prisma:studio`.
 Production deploy: `npm run build && npx prisma migrate deploy && npm start`.
 
+## Token login mode
+
+Set `ALLOW_TOKEN_LOGIN=true` only while the frontend and API are on different domains; keep `JWT_EXPIRES_DAYS` short (e.g. 2). The token is stored in the browser, so use a short expiry and do not load third-party scripts on `/admin`. Switch back to cookie mode (`ALLOW_TOKEN_LOGIN=false`) when a custom domain is available.
+
 ## Edit production content from local
 
 Copy `.env.production.example` to `.env.production` and fill in its values. Then use:

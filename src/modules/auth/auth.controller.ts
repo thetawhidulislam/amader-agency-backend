@@ -18,6 +18,12 @@ export const login = asyncHandler(async (req, res) => {
     ...baseCookie,
     maxAge: env.JWT_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
   });
+
+  if (env.ALLOW_TOKEN_LOGIN === "true") {
+    res.json({ success: true, data: admin, token });
+    return;
+  }
+
   res.json({ success: true, data: admin });
 });
 

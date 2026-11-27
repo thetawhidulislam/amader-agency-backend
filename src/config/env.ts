@@ -11,6 +11,7 @@ const optionalString = z
 const schema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   DB_LABEL: z.enum(["production", "development"]).default("development"),
+  ALLOW_TOKEN_LOGIN: z.enum(["true", "false"]).default("false"),
   PORT: z.coerce.number().int().positive().default(5000),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
 
