@@ -1,4 +1,5 @@
 import app from "./app";
+import { dbHost } from "./config/database";
 import { env } from "./config/env";
 import { prisma } from "./config/prisma";
 
@@ -6,7 +7,9 @@ async function bootstrap() {
   await prisma.$connect();
 
   const server = app.listen(env.PORT, () => {
-    console.log(`API running on http://localhost:${env.PORT} (${env.NODE_ENV})`);
+    console.log(
+      `API running on http://localhost:${env.PORT} mode=${env.DB_LABEL} dbHost=${dbHost} FRONTEND_URL=${env.FRONTEND_URL}`
+    );
   });
 
   const shutdown = (signal: string) => {

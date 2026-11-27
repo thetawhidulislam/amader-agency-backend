@@ -88,6 +88,11 @@ const services = [
 ];
 
 async function main() {
+  if (process.env.DB_LABEL === "production" && process.env.ALLOW_PROD_SEED !== "1") {
+    console.error("Refusing to seed a production database. Set ALLOW_PROD_SEED=1 to override.");
+    process.exit(1);
+  }
+
   const email = (process.env.SEED_ADMIN_EMAIL ?? "admin@amaderagency.com").toLowerCase();
   const password = process.env.SEED_ADMIN_PASSWORD;
   if (!password || password.length < 8) {

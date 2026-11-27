@@ -6,7 +6,7 @@ Express + TypeScript + Prisma (PostgreSQL). Auth via httpOnly JWT cookie, images
 
 ```bash
 npm install
-cp .env.example .env        # fill DATABASE_URL, JWT_SECRET, REVALIDATE_SECRET, SEED_ADMIN_PASSWORD
+cp .env.example .env        # fill DATABASE_URL, DIRECT_URL, JWT_SECRET, REVALIDATE_SECRET, SEED_ADMIN_PASSWORD
 npx prisma migrate dev --name init
 npm run seed                # admin user + 4 services from the brand prospectus + site settings
 npm run dev                 # http://localhost:5000
@@ -17,6 +17,18 @@ Generate secrets:
 
 Other scripts: `npm run typecheck`, `npm run build`, `npm start`, `npm run prisma:studio`.
 Production deploy: `npm run build && npx prisma migrate deploy && npm start`.
+
+## Edit production content from local
+
+Copy `.env.production.example` to `.env.production` and fill in its values. Then use:
+
+```bash
+npm run dev:prod
+npm run migrate:prod
+npm run studio:prod
+```
+
+Never run `prisma migrate dev` or `prisma migrate reset` against the production database. Use `npm run migrate:prod` to deploy migrations safely.
 
 ## Deploy on Vercel
 
